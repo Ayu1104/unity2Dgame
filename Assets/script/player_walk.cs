@@ -5,6 +5,10 @@ public class player_walk : MonoBehaviour {
 	protected Animator animator;
 	private float directionX = 0;
 	private bool walking = false; //歩いているかどうか　初期は止まっているのでfalse
+	public bool jumping = false; //ジャンプ
+	public float jumppower = 500;
+	//public Vector3 vec3;
+	//public float coefficient;   // 空気抵抗係数
 
 	void Start (){
 		animator = GetComponent<Animator> ();
@@ -14,9 +18,10 @@ public class player_walk : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		//if (animator) {
+		//rigidbody.AddForce(-coefficient * rigidbody.velocity);
+		if (animator) {
 						//左右キーの入力
-						float h = Input.GetAxisRaw ("Horizontal");
+						float h = Input.GetAxisRaw ("Horizontal"); //キーの入力を取得
 						walking = true; //歩いているとき
 
 						if (h > 0) { //右が入力されているとき
@@ -30,14 +35,31 @@ public class player_walk : MonoBehaviour {
 						if (walking) { //walkingがtureのとき＝歩いているとき
 								transform.Translate (new Vector2 (directionX,0) * Time.deltaTime * 2.0f);
 						}
+						if(!jumping){
+							if (Input.GetKeyDown (KeyCode.Space)) {
+								jumping = true;
+								rigidbody.AddForce(
+								Vector3.up*jumppower,
+								ForceMode.Force);
+						
+									}
+						}
 
 						//animatorの値に適用
 						animator.SetFloat ("DirectionX", directionX);
+						Debug.Log (directionX);
 						//animator.SetFloat ("DirectionY", directionX);
 						//animator.SetFloat ("DirectionY", directionY);
 						animator.SetBool ("Walking", walking);
+						animator.SetBool ("Jumping", jumping);
 
-		Debug.Log (directionX);
-				//		}
+						}
+
+
 	}
+	
+	void OnCollisionEnter(Collision col){
+		jumping = false;
+	}
+
 }
